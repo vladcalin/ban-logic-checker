@@ -59,15 +59,16 @@ class ProtocolStep(object):
         self.msg = msg
     
     def __repr__(self):
-        return "Step({}, {} -> {})", self.msg, self.channel.actor1.name, self.channel.actor2.name
+        return "Step({}, {} -> {})".format(self.msg, self.channel.actor1.name, self.channel.actor2.name)
 
 
 class ProtocolSpecification(object):
-    def __init__(self, name, actors, channels, steps):
+    def __init__(self, name, actors, assumptions, channels, steps):
         self.name = name
         self.actors = actors
-        self.steps = steps
+        self.assumptions = assumptions
         self.channels = channels
+        self.steps = steps
 
     def __repr__(self):
         template = """
@@ -98,17 +99,23 @@ Steps:
 
 
 if __name__ == '__main__':
-    alice = ProtocolActor("alice")
-    bob = ProtocolActor("bob")
+    alice   = ProtocolActor("alice")
+    bob     = ProtocolActor("bob")
+    server  = ProtocolActor("server")
 
     protocol = ProtocolSpecification(
         name="example_protocol",
-        actors=(alice, bob),
-        channels=[
+        actors = (alice, bob, server),
+        assumptions = [
+        ],
+        channels = [
             ProtocolChannel("a_to_b", alice, bob),
             ProtocolChannel("b_to_a", bob, alice)
         ],
         steps=[
+            ProtocolStep(ProtocolChannel("s_to_a", server, alice), None),
+            ProtocolStep(ProtocolChannel("a_to_b", alice, bob), None),
+            ProtocolStep(ProtocolChannel("b_to_a", bob, alice), None),
         ]
     )
 
