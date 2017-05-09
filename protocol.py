@@ -24,7 +24,12 @@ class ProtocolChannel(object):
 
 
 class ProtocolStep(object):
-    pass
+    def __init__(self, channel, msg):
+        self.channel = channel
+        self.msg = msg
+    
+    def __repr__(self):
+        return "Step({}, {} -> {})", self.msg, self.channel.actor1.name, self.channel.actor2.name
 
 
 class ProtocolSpecification(object):
@@ -74,7 +79,6 @@ if __name__ == '__main__':
             ProtocolChannel("b_to_a", bob, alice)
         ],
         steps=[
-
         ]
     )
 
