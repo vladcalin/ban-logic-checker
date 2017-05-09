@@ -1,3 +1,7 @@
+import random
+import string
+
+
 class ProtocolActor(object):
     def __init__(self, name):
         self.name = name
@@ -5,9 +9,35 @@ class ProtocolActor(object):
     def __repr__(self):
         return "Actor('{}')".format(self.name)
 
+    def generate_nonce(self):
+        token = "".join([random.choice(string.hexdigits) for _ in range(5)])
+        return Nonce("{}-nonce-{}".format(self.name, token))
+
 
 class ProtocolObject(object):
-    pass
+    def __init__(self, identifier):
+        self.id = identifier
+
+
+class Nonce(ProtocolObject):
+    def __init__(self, identifier=None):
+        if not identifier:
+            identifier = "nonce-{}".format("".join([random.choice(string.hexdigits) for _ in range(5)]))
+        super(Nonce, self).__init__(identifier)
+
+
+class Value(ProtocolObject):
+    def __init__(self, identifier=None):
+        if not identifier:
+            identifier = "nonce-{}".format("".join([random.choice(string.hexdigits) for _ in range(5)]))
+        super(Value, self).__init__(identifier)
+
+
+class EncryptedValue(ProtocolObject):
+    def __init__(self, key, *items):
+        self.key = key
+        self.items = items
+        super(EncryptedValue, self).__init__("{{}}_{}".format(self.items, self.key))
 
 
 class ProtocolChannel(object):
