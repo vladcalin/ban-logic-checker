@@ -1,6 +1,6 @@
 import random
 import string
-from entities import EncryptedFormula
+from entities import SharedKey, EncryptedFormula
 
 
 class ProtocolActor(object):
@@ -104,9 +104,9 @@ if __name__ == '__main__':
     bob     = ProtocolActor("bob")
     server  = ProtocolActor("server")
 
-    K_as = SharedKey("K_as), alice, server)
-    K_sb = SharedKey("K_sb), server, bob)
-    K_ab = SharedKey("K_ab), alice, bob)
+    K_as = SharedKey("K_as", alice, server)
+    K_sb = SharedKey("K_sb", server, bob)
+    K_ab = SharedKey("K_ab", alice, bob)
 
     protocol = ProtocolSpecification(
         name="example_protocol",
