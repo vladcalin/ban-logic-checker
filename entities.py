@@ -1,10 +1,16 @@
+import random
+import string
+
 """
 Not yet finished. We might have to rethink a little bit how
 we will model the logic constructions
 """
 
+
 class BanObject(object):
-    pass
+    @staticmethod
+    def get_rand_token(chars):
+        return "".join([random.choice(string.hexdigits) for _ in range(chars)])
 
 
 class BanActor(BanObject):
@@ -88,10 +94,22 @@ class SharedSecret(BanConstruction):
         self.secret = secret
 
 
-class EncryptedFormula(BanObject):
+class Message(BanObject):
+    def __init__(self, identifier, *msgs):
+        self.msgs = msgs
+        self.id = identifier
+
+
+class EncryptedFormula(Message):
     def __init__(self, obj, key):
         self.obj = obj
         self.key = key
+        super(EncryptedFormula, self).__init__("{{}}_{}".format(self.obj, self.key), obj)
 
     def __repr__(self):
         return "{{}}_{}".format(self.obj, self.key)
+
+
+if __name__ == '__main__':
+    Message("X")
+    Message(Message("X"), Message("Y"))
