@@ -1,5 +1,6 @@
 import random
 import string
+from entities import EncryptedFormula
 
 
 class ProtocolActor(object):
@@ -103,6 +104,10 @@ if __name__ == '__main__':
     bob     = ProtocolActor("bob")
     server  = ProtocolActor("server")
 
+    K_as = SharedKey("K_as), alice, server)
+    K_sb = SharedKey("K_sb), server, bob)
+    K_ab = SharedKey("K_ab), alice, bob)
+
     protocol = ProtocolSpecification(
         name="example_protocol",
         actors = (alice, bob, server),
@@ -113,7 +118,7 @@ if __name__ == '__main__':
             ProtocolChannel("b_to_a", bob, alice)
         ],
         steps=[
-            ProtocolStep(ProtocolChannel("s_to_a", server, alice), None),
+            ProtocolStep(ProtocolChannel("s_to_a", server, alice), EncryptedFormula(None, K_as)),
             ProtocolStep(ProtocolChannel("a_to_b", alice, bob), None),
             ProtocolStep(ProtocolChannel("b_to_a", bob, alice), None),
         ]
