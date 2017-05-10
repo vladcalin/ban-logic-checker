@@ -1,4 +1,4 @@
-from entities import Believes, SharedKey, EncryptedFormula
+from entities import Believes, Said, SharedKey, EncryptedFormula
 
 class Rule(object):
     def argsCount(self):
@@ -18,8 +18,13 @@ class Decryption(Rule):
         if key.obj != msg.key: return []
 
         actor1 = key.actor
-        pass
+        actor2 = None
+        if key.obj.actor1 == actor1:
+            actor2 = key.obj.actor2
+        else:
+            actor2 = key.obj.actor1
 
+        return [Believes(actor1, Said(actor2, msg.obj))]
 
 
 class NonceVerification(Rule):
