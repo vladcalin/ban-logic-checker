@@ -1,4 +1,4 @@
-from entities import Believes, Said, SharedKey, EncryptedFormula
+from entities import Believes, Said, SharedKey, EncryptedFormula, Fresh
 
 
 class Rule(object):
@@ -31,6 +31,15 @@ class Decryption(Rule):
 class NonceVerification(Rule):
     def argsCount(self):
         return 2
+
+    def apply(self, nonce, msg):
+        if not isinstance(nonce, Believes): return []
+        if not isinstance(nonce.obj, Fresh): return []
+        if not isinstance(msg, Believes): return []
+        if not isinstance(msg.obj, Said): return []
+        if nonce.obj.obj != msg.obj.obj: return []
+
+        return [Believes(msg.actor, Believes(msg.obj.actor, msg.obj.obj))]
 
 
 class Jurisdiction(Rule):
