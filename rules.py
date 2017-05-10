@@ -1,11 +1,13 @@
 from entities import Believes, Said, SharedKey, EncryptedFormula
 
+
 class Rule(object):
     def argsCount(self):
         raise NotImplementedError()
 
     def apply(self, *args, **kwargs):
         raise NotImplementedError()
+
 
 class Decryption(Rule):
     def argsCount(self):
@@ -30,11 +32,12 @@ class NonceVerification(Rule):
     def argsCount(self):
         return 2
 
+
 class Jurisdiction(Rule):
     def argsCount(self):
         return 2
 
+
 class Decomposition(Rule):
     def argsCount(self):
         return 2
-

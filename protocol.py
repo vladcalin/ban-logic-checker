@@ -153,3 +153,25 @@ if __name__ == '__main__':
     )
 
     print(protocol_kerberos)
+
+    # andrew rpc
+
+    Na = Nonce("Na")
+    Nb = Nonce("Nb")
+
+    protocol_andrew_rpc = ProtocolSpecification(
+        name="andrew_rpc",
+        actors=(alice, bob),
+        channels=[
+            a_to_b, b_to_a
+        ],
+        assumptions=[],
+        steps=[
+            ProtocolStep(a_to_b, EncryptedFormula(Na, K_ab)),
+            ProtocolStep(b_to_a, EncryptedFormula(Message(Na, Nb), K_ab)),
+            ProtocolStep(a_to_b, EncryptedFormula(Nb, K_ab)),
+            ProtocolStep(b_to_a, EncryptedFormula(Message(shared_key_a_b, Nb), K_ab))
+        ]
+    )
+
+    print(protocol_andrew_rpc)
