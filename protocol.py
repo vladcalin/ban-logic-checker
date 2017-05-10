@@ -1,6 +1,6 @@
 import random
 import string
-from entities import SharedKey, EncryptedFormula
+from entities import SharedKey, EncryptedFormula, Message
 
 
 class ProtocolActor(object):
@@ -26,12 +26,24 @@ class Nonce(ProtocolObject):
             identifier = "nonce-{}".format("".join([random.choice(string.hexdigits) for _ in range(5)]))
         super(Nonce, self).__init__(identifier)
 
+    def __repr__(self):
+        return self.id
+
 
 class Value(ProtocolObject):
     def __init__(self, identifier=None):
         if not identifier:
-            identifier = "nonce-{}".format("".join([random.choice(string.hexdigits) for _ in range(5)]))
+            identifier = "value-{}".format("".join([random.choice(string.hexdigits) for _ in range(5)]))
         super(Value, self).__init__(identifier)
+
+    def __eq__(self, other):
+        if not isinstance(other, Value):
+            return False
+
+        return self.id == other.id
+
+    def __repr__(self):
+        return self.id
 
 
 class EncryptedValue(ProtocolObject):
@@ -58,7 +70,7 @@ class ProtocolStep(object):
     def __init__(self, channel, msg):
         self.channel = channel
         self.msg = msg
-    
+
     def __repr__(self):
         return "Step({}, {} -> {})".format(self.msg, self.channel.actor1.name, self.channel.actor2.name)
 
@@ -100,28 +112,44 @@ Steps:
 
 
 if __name__ == '__main__':
-    alice   = ProtocolActor("alice")
-    bob     = ProtocolActor("bob")
-    server  = ProtocolActor("server")
+    alice = ProtocolActor("alice")
+    bob = ProtocolActor("bob")
+    server = ProtocolActor("server")
 
-    K_as = SharedKey("K_as", alice, server)
-    K_sb = SharedKey("K_sb", server, bob)
-    K_ab = SharedKey("K_ab", alice, bob)
+    K_as = Value("K_as")
+    K_sb = Value("K_sb")
+    K_ab = Value("K_ab")
+    K_bs = Value("K_bs")
 
-    protocol = ProtocolSpecification(
-        name="example_protocol",
-        actors = (alice, bob, server),
-        assumptions = [
+    shared_key_a_s = SharedKey(K_as, alice, server)
+    shared_key_s_b = SharedKey(K_sb, server, bob)
+    shared_key_a_b = SharedKey(K_ab, alice, bob)
+
+    Ts = Nonce("Ts")
+    Ta = Nonce("Ta")
+
+    a_to_b = ProtocolChannel("a_to_b", alice, bob)
+    b_to_a = ProtocolChannel("b_to_a", bob, alice)
+    s_to_a = ProtocolChannel("s_to_a", server, alice)
+
+    protocol_kerberos = ProtocolSpecification(
+        name="kerberos",
+        actors=(alice, bob, server),
+        assumptions=[
         ],
-        channels = [
-            ProtocolChannel("a_to_b", alice, bob),
-            ProtocolChannel("b_to_a", bob, alice)
+        channels=[
+            a_to_b, b_to_a, s_to_a
         ],
         steps=[
-            ProtocolStep(ProtocolChannel("s_to_a", server, alice), EncryptedFormula(None, K_as)),
-            ProtocolStep(ProtocolChannel("a_to_b", alice, bob), None),
-            ProtocolStep(ProtocolChannel("b_to_a", bob, alice), None),
+            ProtocolStep(s_to_a, EncryptedFormula(
+                Message(Ts, shared_key_a_b, EncryptedFormula(Message(Ts, shared_key_a_b), K_bs)),
+                K_as)),
+            ProtocolStep(a_to_b, Message(
+                EncryptedFormula(Message(Ts, shared_key_a_b), K_bs),
+                EncryptedFormula(Message(Ta, shared_key_a_b), K_ab)
+            )),
+            ProtocolStep(b_to_a, EncryptedFormula(Message(Ta, shared_key_a_b), K_ab)),
         ]
     )
 
-    print(protocol)
+    print(protocol_kerberos)
