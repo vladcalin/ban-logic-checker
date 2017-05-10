@@ -18,7 +18,6 @@ class Decryption(Rule):
         if key.obj != msg.key: return []
 
         actor1 = key.actor
-        actor2 = None
         if key.obj.actor1 == actor1:
             actor2 = key.obj.actor2
         else:
