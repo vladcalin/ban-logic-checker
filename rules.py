@@ -61,7 +61,7 @@ class Jurisdiction(Rule):
 
 class Decomposition(Rule):
     def argsCount(self):
-        return 2
+        return 1
 
     def apply(self):
         pass
