@@ -74,6 +74,9 @@ class SharedKey(BanConstruction):
         self.actor1 = actor1
         self.actor2 = actor2
 
+    def __repr__(self):
+        return "{} <- {} -> {}".format(self.actor1.name, self.key, self.actor2.name)
+
 
 class HasPublicKey(BanConstruction):
     def __init__(self, actor, pub_key):
@@ -95,9 +98,11 @@ class SharedSecret(BanConstruction):
 
 
 class Message(BanObject):
-    def __init__(self, identifier, *msgs):
+    def __init__(self, *msgs):
         self.msgs = msgs
-        self.id = identifier
+
+    def __repr__(self):
+        return ", ".join([str(m) for m in self.msgs])
 
 
 class EncryptedFormula(Message):
@@ -107,7 +112,7 @@ class EncryptedFormula(Message):
         super(EncryptedFormula, self).__init__("{{}}_{}".format(self.obj, self.key), obj)
 
     def __repr__(self):
-        return "{{}}_{}".format(self.obj, self.key)
+        return "{{{}}}_{}".format(self.obj, self.key)
 
 
 if __name__ == '__main__':
