@@ -1,4 +1,4 @@
-from entities import Believes, Said, SharedKey, EncryptedFormula, Fresh
+from entities import Believes, Said, SharedKey, EncryptedFormula, Fresh, Controls
 
 class Rule(object):
     def argsCount(self):
@@ -35,6 +35,7 @@ class NonceVerification(Rule):
         if not isinstance(nonce.obj, Fresh): return []
         if not isinstance(msg, Believes): return []
         if not isinstance(msg.obj, Said): return []
+        if nonce.actor != msg.actor: return []
         if nonce.obj.obj != msg.obj.obj: return []
 
         return [Believes(msg.actor, Believes(msg.obj.actor, msg.obj.obj))]
@@ -44,7 +45,21 @@ class Jurisdiction(Rule):
     def argsCount(self):
         return 2
 
+    def apply(self, controls, msg):
+        if not isinstance(controls, Believes): return []
+        if not isinstance(controls.obj, Controls): return []
+        if not isinstance(msg, Believes): return []
+        if not isinstance(msg.obj, Believes): return []
+        if controls.actor != msg.actor: return []
+        if controls.obj.actor != msg.obj.actor: return []
+        if controls.obj.obj != msg.obj.obj: return []
+
+        return [Believes(msg.actor, msg.obj.obj)]
+
 class Decomposition(Rule):
     def argsCount(self):
         return 2
+
+    def apply(self):
+        pass
 
